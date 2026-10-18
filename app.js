@@ -39,7 +39,7 @@
   // ---------- state ----------
   function defaultState() {
     return {
-      loggedIn: true,
+      loggedIn: false,
       me: {
         id: 'me', name: 'Alex Student', major: '', year: 'Freshman',
         bio: 'New here and finding my way around AURAK — say hi!',
