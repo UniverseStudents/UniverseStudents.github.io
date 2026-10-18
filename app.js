@@ -1146,9 +1146,23 @@
     ui.auth.draft = { name: name.value, major: major.value, year: year.value, bio: bio.value };
   }
 
+  // this demo has no real account lookup, so a first-time "Log In" derives a display
+  // name from the email instead of showing the placeholder default
+  function nameFromEmail(email) {
+    const local = email.split('@')[0] || '';
+    const words = local.split(/[._\-0-9]+/).filter(Boolean);
+    if (!words.length) return '';
+    return words.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  }
+
   function doLogin() {
     const email = document.getElementById('login-email').value.trim();
     if (!email) { toast('Enter your university email to continue.'); return; }
+    if (!state.me.customized) {
+      const derived = nameFromEmail(email);
+      if (derived) state.me.name = derived;
+      state.me.customized = true;
+    }
     state.loggedIn = true;
     toast(`Welcome back, ${state.me.name}!`);
     go('home');
@@ -1178,7 +1192,7 @@
     const major = document.getElementById('reg-major').value;
     const year = document.getElementById('reg-year').value;
     const bio = document.getElementById('reg-bio').value.trim();
-    state.me = { ...state.me, name, major, year, bio: bio || 'Say hi — I just joined UniVerse!', tier: ui.auth.tier || 'free' };
+    state.me = { ...state.me, name, major, year, bio: bio || 'Say hi — I just joined UniVerse!', tier: ui.auth.tier || 'free', customized: true };
     state.loggedIn = true;
     toast('Welcome to UniVerse! Your student account is verified.');
     go('home');
@@ -1296,6 +1310,7 @@
     state.me.major = document.getElementById('edit-major').value;
     state.me.year = document.getElementById('edit-year').value;
     state.me.bio = document.getElementById('edit-bio').value.trim();
+    state.me.customized = true;
     ui.modal = null;
     toast('Profile updated.');
     rerender();
